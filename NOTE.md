@@ -30,4 +30,4 @@ User
 5. Hash password with `scrypt`
 6. Save user
 7. Return success or create session
-8. Login user and redirect
+8. Login user and redirect (generate a session token and set a cookie)
