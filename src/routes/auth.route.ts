@@ -6,7 +6,7 @@ import {
   hashPassword,
   verifyPassword,
 } from "../services/auth.service";
-import { createSession } from "../services/session.service";
+import { createSession, deleteSession } from "../services/session.service";
 const router = express.Router();
 
 router.post("/register", async (req, res) => {
@@ -65,6 +65,19 @@ router.post("/login", async (req, res) => {
         maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days in milliseconds
       })
       .json({ message: "Login successful" });
+  } catch (err) {
+    console.error(err);
+    res.status(500).send("Internal server error");
+  }
+});
+
+router.post("/logout", async (req, res) => {
+  try {
+    const token = req.cookies.session;
+    if (!token) return res.status(400).send("No session found");
+    deleteSession(token);
+    res.clearCookie("session");
+    res.status(200).json({ message: "Logged out seccessfully" });
   } catch (err) {
     console.error(err);
     res.status(500).send("Internal server error");

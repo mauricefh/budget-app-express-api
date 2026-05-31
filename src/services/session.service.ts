@@ -22,3 +22,7 @@ export function getSession(token: string): Session | null {
   const session = query.get(token) as Session | null;
   return session;
 }
+
+export function deleteSession(token: string): void {
+  db.prepare("DELETE FROM users_sessions WHERE token = ?").run(token);
+}
