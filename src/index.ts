@@ -4,8 +4,9 @@ import home from "./routes/home.route";
 import register from "./routes/auth.route";
 
 // Setup
-const app = express();
 const port = 3000;
+const app = express();
+app.disable("x-powered-by");
 
 // Allow json request parsing
 app.use(express.json());

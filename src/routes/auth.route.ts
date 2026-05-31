@@ -6,6 +6,7 @@ import {
   hashPassword,
   verifyPassword,
 } from "../services/auth.service";
+import { createSession } from "../services/session.service";
 const router = express.Router();
 
 router.post("/register", async (req, res) => {
@@ -53,8 +54,17 @@ router.post("/login", async (req, res) => {
     if (!isPasswordValid)
       return res.status(401).send("Wrong email or password");
 
-    // 7. If correct — return 200 (session comes next)
-    res.status(200).json({ message: "Login successful" });
+    // 7. If correct — create session, generate cookies and return 200
+    const token = createSession(user.id);
+    res
+      .status(200)
+      .cookie("session", token, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "lax",
+        maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days in milliseconds
+      })
+      .json({ message: "Login successful" });
   } catch (err) {
     console.error(err);
     res.status(500).send("Internal server error");

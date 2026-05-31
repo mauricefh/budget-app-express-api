@@ -42,3 +42,7 @@ User
 6. Check the created hash against the hash in the database (don't use === to compare string because otherwise a hacker can use timing based attack to figure out the hashed password of a user in node we use `timingSafeEqual(BufferOne, BufferTwo)`)
 7. If incorrect same error message at step 3
 8. If correct create a cookie or session and redirect
+
+## Session
+
+Login works without session but the server immediately forgets who you are. Every request starts fresh. Sessions fix that by giving the user a token that proves "I already logged in" so they don't have to send their password every time.
