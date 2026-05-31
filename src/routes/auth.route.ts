@@ -2,7 +2,9 @@ import express from "express";
 import {
   createUser,
   findUserByEmail,
+  findUserByEmailWithCredentials,
   hashPassword,
+  verifyPassword,
 } from "../services/auth.service";
 const router = express.Router();
 
@@ -19,6 +21,40 @@ router.post("/register", async (req, res) => {
 
     const newUserId = createUser(email, hash, salt);
     res.status(201).json({ id: newUserId });
+  } catch (err) {
+    console.error(err);
+    res.status(500).send("Internal server error");
+  }
+});
+
+router.post("/login", async (req, res) => {
+  try {
+    // 1. Get email and password from body
+    const { email, password } = req.body;
+
+    // 2. Validate they exist
+    if (!email) return res.status(400).send("Missing email field");
+    if (!password) return res.status(400).send("Missing password field");
+
+    // 3. Find user with credentials
+    const user = findUserByEmailWithCredentials(email);
+
+    // 4. If no user — return 401
+    if (!user) return res.status(401).send("Wrong email or password");
+
+    // 5. Verify password
+    const isPasswordValid = await verifyPassword(
+      password,
+      user.salt,
+      user.password,
+    );
+
+    // 6. If wrong — return 401
+    if (!isPasswordValid)
+      return res.status(401).send("Wrong email or password");
+
+    // 7. If correct — return 200 (session comes next)
+    res.status(200).json({ message: "Login successful" });
   } catch (err) {
     console.error(err);
     res.status(500).send("Internal server error");

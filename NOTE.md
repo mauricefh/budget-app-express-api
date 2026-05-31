@@ -31,3 +31,14 @@ User
 6. Save user
 7. Return success or create session
 8. Login user and redirect (generate a session token and set a cookie)
+
+## Login Flow
+
+1. User send credentials
+2. We fetch the user by email
+3. If no user is found return "Wrong email or password" (using user enumeration protection so a hacker can't tell if a user is register with that email or not)
+4. If the user exist get the hash and salt
+5. Get the user inputted password and salt to create the hash
+6. Check the created hash against the hash in the database (don't use === to compare string because otherwise a hacker can use timing based attack to figure out the hashed password of a user in node we use `timingSafeEqual(BufferOne, BufferTwo)`)
+7. If incorrect same error message at step 3
+8. If correct create a cookie or session and redirect
