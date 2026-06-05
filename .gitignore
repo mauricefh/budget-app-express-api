@@ -140,5 +140,8 @@ dist
 
 scripts/
 cookies.txt
-.db
-.db*
+*.db
+sqlite.db
+sqlite.db-shm
+sqlite.db-wal
+

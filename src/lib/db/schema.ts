@@ -1,6 +1,5 @@
 import { db } from "./database";
 
-// Users
 db.exec(`
   CREATE TABLE IF NOT EXISTS users (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -10,9 +9,8 @@ db.exec(`
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP
   )
 `);
-db.exec(`CREATE INDEX IF NOT EXISTS idx_user_email ON users(email)`);
+db.exec(`CREATE INDEX IF NOT EXISTS idx_users_user_email ON users(email)`);
 
-// Sessions
 db.exec(`
   CREATE TABLE IF NOT EXISTS users_sessions (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -23,4 +21,61 @@ db.exec(`
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
   )
 `);
-db.exec(`CREATE INDEX IF NOT EXISTS idx_user_token ON users_sessions(token)`);
+db.exec(
+  `CREATE INDEX IF NOT EXISTS idx_users_sessions_user_token ON users_sessions(token)`,
+);
+
+db.exec(`
+  CREATE TABLE IF NOT EXISTS accounts (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name TEXT NOT NULL,
+    type TEXT CHECK(type IN ('checking', 'saving', 'credit', 'loan')) NOT NULL,
+    user_id INTEGER NOT NULL,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+  )
+`);
+db.exec(`CREATE INDEX IF NOT EXISTS idx_accounts_user_id ON accounts(user_id)`);
+
+db.exec(`
+  CREATE TABLE IF NOT EXISTS categories(
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name TEXT NOT NULL,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+  )
+`);
+
+db.exec(`
+  CREATE TABLE IF NOT EXISTS groups(
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name TEXT NOT NULL,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+  )
+`);
+
+db.exec(`
+  CREATE TABLE IF NOT EXISTS transactions(
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name TEXT NOT NULL,
+    amount INTEGER NOT NULL,
+    description TEXT,
+    date TEXT NOT NULL,
+    type TEXT CHECK(type IN ('income', 'expense')) NOT NULL,
+    frequency TEXT CHECK(frequency IN ('daily', 'weekly', 'biweekly', 'monthly', 'custom')),
+    user_id INTEGER NOT NULL,
+    account_id INTEGER NOT NULL,
+    category_id INTEGER,
+    group_id INTEGER,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+    FOREIGN KEY (account_id) REFERENCES accounts(id) ON DELETE CASCADE,
+    FOREIGN KEY (category_id) REFERENCES categories(id) ON DELETE SET NULL,
+    FOREIGN KEY (group_id) REFERENCES groups(id) ON DELETE SET NULL
+  )
+`);
+db.exec(
+  `CREATE INDEX IF NOT EXISTS idx_transactions_user_id ON transactions(user_id)`,
+);
+db.exec(
+  `CREATE INDEX IF NOT EXISTS idx_transactions_account_id ON transactions(account_id)`,
+);
