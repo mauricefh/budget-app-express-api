@@ -2,6 +2,11 @@ import { scrypt, randomBytes, timingSafeEqual } from "node:crypto";
 import { db } from "../lib/db/database";
 import { User, UserWithCredentials } from "../types/user";
 
+export function findUserById(id: number): User | null {
+  const query = db.prepare("SELECT id, email FROM users WHERE id = ?");
+  return query.get(id) as User | null;
+}
+
 export function findUserByEmail(email: string): User | null {
   const query = db.prepare("SELECT id, email FROM users WHERE email = ?");
   return query.get(email) as User | null;

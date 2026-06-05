@@ -2,7 +2,8 @@ import express from "express";
 import "./lib/db/schema";
 import cookieParser from "cookie-parser";
 import home from "./routes/home.route";
-import register from "./routes/auth.route";
+import auth from "./routes/auth.route";
+import user from "./routes/user.route";
 
 // Setup
 const port = 3000;
@@ -17,7 +18,8 @@ app.use(express.json());
 
 // Route
 app.use("/", home);
-app.use("/api/auth", register);
+app.use("/api/auth", auth);
+app.use("/api/user", user);
 
 app.listen(port, () => {
   console.log(`🚀 Server ready at: http://localhost:${port}`);

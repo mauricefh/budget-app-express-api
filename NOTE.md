@@ -46,3 +46,25 @@ User
 ## Session
 
 Login works without session but the server immediately forgets who you are. Every request starts fresh. Sessions fix that by giving the user a token that proves "I already logged in" so they don't have to send their password every time.
+
+## TypeScript Declaration Merging
+
+Declaration Merging is a common pattern in TypeScript that allow extending interfaces
+
+Example in Express for the Request interface we add the User types
+
+```typescript
+import { User } from "./user";
+
+declare global {
+  namespace Express {
+    interface Request {
+      user?: User;
+    }
+  }
+}
+```
+
+## Interview Answers
+
+"I built a REST API in Express and TypeScript with authentication implemented from scratch — no auth libraries. I used scrypt for password hashing with random salts, session tokens stored in SQLite, and HttpOnly cookies. I can explain why each decision was made."
