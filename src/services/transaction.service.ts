@@ -7,7 +7,7 @@ import {
 
 export function getTransactions(userId: number): Transaction[] {
   const query = db.prepare(
-    "SELECT id, name, amount, description, date, type, recurring_frequency, recurring_day, recurring_interval, user_id, account_id, category_id, group_id FROM transactions WHERE user_id = ?",
+    "SELECT id, name, amount, description, date, type, recurring_frequency, recurring_day, recurring_month, recurring_interval, user_id, account_id, category_id, group_id FROM transactions WHERE user_id = ?",
   );
   return query.all(userId) as Transaction[];
 }
@@ -17,14 +17,14 @@ export function getTransactionById(
   userId: number,
 ): Transaction | null {
   const query = db.prepare(
-    "SELECT id, name, amount, description, date, type, recurring_frequency, recurring_day, recurring_interval, user_id, account_id, category_id, group_id FROM transactions WHERE id = ? AND user_id = ?",
+    "SELECT id, name, amount, description, date, type, recurring_frequency, recurring_day, recurring_month, recurring_interval, user_id, account_id, category_id, group_id FROM transactions WHERE id = ? AND user_id = ?",
   );
   return query.get(id, userId) as Transaction;
 }
 
 export function createTransaction(transaction: CreateTransaction): number {
   const query = db.prepare(
-    "INSERT INTO transactions (name, amount, description, date, type, recurring_frequency, recurring_day, recurring_interval, user_id, account_id, category_id, group_id) VALUES (?,?,?,?,?,?,?,?,?,?, ?,?)",
+    "INSERT INTO transactions (name, amount, description, date, type, recurring_frequency, recurring_day, recurring_month, recurring_interval, user_id, account_id, category_id, group_id) VALUES (?,?,?,?,?,?,?,?,?,?, ?,?,?)",
   );
   const result = query.run(
     transaction.name,
@@ -34,6 +34,7 @@ export function createTransaction(transaction: CreateTransaction): number {
     transaction.type,
     transaction.recurring_frequency,
     transaction.recurring_day,
+    transaction.recurring_month,
     transaction.recurring_interval,
     transaction.user_id,
     transaction.account_id,
@@ -48,7 +49,7 @@ export function updateTransaction(
   transaction: UpdateTransaction,
 ): number {
   const query = db.prepare(
-    "UPDATE transactions SET name = ?, amount = ?, description = ?, date = ?, type = ?, recurring_frequency = ?, recurring_day = ?, recurring_interval = ?, account_id = ?, category_id = ?, group_id = ? WHERE id = ? AND user_id = ?",
+    "UPDATE transactions SET name = ?, amount = ?, description = ?, date = ?, type = ?, recurring_frequency = ?, recurring_day = ?, recurring_month = ?, recurring_interval = ?, account_id = ?, category_id = ?, group_id = ? WHERE id = ? AND user_id = ?",
   );
   const result = query.run(
     transaction.name,
@@ -58,6 +59,7 @@ export function updateTransaction(
     transaction.type,
     transaction.recurring_frequency,
     transaction.recurring_day,
+    transaction.recurring_month,
     transaction.recurring_interval,
     transaction.account_id,
     transaction.category_id,

@@ -10,8 +10,9 @@ export type Transaction = Base & {
   description?: string;
   date: string;
   type: "income" | "expense";
-  recurring_frequency?: "daily" | "weekly" | "biweekly" | "monthly" | "custom";
+  recurring_frequency?: "daily" | "weekly" | "monthly" | "yearly";
   recurring_day?: number;
+  recurring_month?: number;
   recurring_interval?: number;
   user_id: number;
   account_id: number;
@@ -37,8 +38,9 @@ export type UpdateTransaction = Omit<
   description?: string;
   date?: string;
   type?: "income" | "expense";
-  recurring_frequency?: "daily" | "weekly" | "biweekly" | "monthly" | "custom";
+  recurring_frequency?: "daily" | "weekly" | "monthly" | "yearly";
   recurring_day?: number;
+  recurring_month?: number;
   recurring_interval?: number;
   account_id?: number;
   category_id?: number;

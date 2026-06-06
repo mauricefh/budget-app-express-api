@@ -5,7 +5,10 @@
   "main": "index.ts",
   "type": "",
   "scripts": {
-    "dev": "nodemon --exec tsx src/index.ts",
+    "dev": "NODE_ENV=development nodemon --exec tsx src/index.ts",
+    "dev:watch": "NODE_ENV=development nodemon --exec tsx src/index.ts",
+    "start": "NODE_ENV=production nodemon --exec tsx src/index.ts",
+    "seed": "tsx src/lib/db/seed.ts",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
@@ -21,10 +24,12 @@
   "dependencies": {
     "better-sqlite3": "^12.10.0",
     "cookie-parser": "^1.4.7",
+    "dotenv": "^17.4.2",
     "express": "^5.2.1",
     "node-cron": "^4.2.1"
   },
   "devDependencies": {
+    "@faker-js/faker": "^10.4.0",
     "@types/better-sqlite3": "^7.6.13",
     "@types/cookie-parser": "^1.4.10",
     "@types/express": "^5.0.6",
