@@ -7,6 +7,7 @@ import auth from "./routes/auth.route";
 import user from "./routes/user.route";
 import account from "./routes/account.route";
 import transaction from "./routes/transaction.route";
+import category from "./routes/category.route";
 import { startRecurringJob } from "./jobs/recurring.job";
 
 // Setup
@@ -27,6 +28,7 @@ app.use("/api/auth", auth);
 app.use("/api/user", user);
 app.use("/api/accounts", account);
 app.use("/api/transactions", transaction);
+app.use("/api/categories", category);
 
 // Background Jobs
 startRecurringJob();

@@ -14,6 +14,13 @@ db.exec(`DELETE FROM transactions`);
 db.exec(`DELETE FROM accounts`);
 db.exec(`DELETE FROM users`);
 
+// db.prepare("INSERT INTO categories (name) VALUES (?)").run("Home");
+// db.prepare("INSERT INTO categories (name) VALUES (?)").run("Home");
+// db.prepare("INSERT INTO categories (name) VALUES (?)").run("Home");
+// db.prepare("INSERT INTO categories (name) VALUES (?)").run("Home");
+// db.prepare("INSERT INTO categories (name) VALUES (?)").run("Home");
+// db.prepare("INSERT INTO categories (name) VALUES (?)").run("Home");
+
 const email = "inbox@mauricefh.com";
 const password = "Password123@";
 const { hash, salt } = await hashPassword(password);
