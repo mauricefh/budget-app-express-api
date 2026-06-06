@@ -4,6 +4,7 @@ import cookieParser from "cookie-parser";
 import home from "./routes/home.route";
 import auth from "./routes/auth.route";
 import user from "./routes/user.route";
+import account from "./routes/account.route";
 
 // Setup
 const port = 3000;
@@ -20,6 +21,7 @@ app.use(express.json());
 app.use("/", home);
 app.use("/api/auth", auth);
 app.use("/api/user", user);
+app.use("/api/accounts", account);
 
 app.listen(port, () => {
   console.log(`🚀 Server ready at: http://localhost:${port}`);

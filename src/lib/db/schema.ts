@@ -29,7 +29,7 @@ db.exec(`
   CREATE TABLE IF NOT EXISTS accounts (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     name TEXT NOT NULL,
-    type TEXT CHECK(type IN ('checking', 'saving', 'credit', 'loan')) NOT NULL,
+    type TEXT CHECK(type IN ('cash', 'checking', 'saving', 'credit', 'loan')) NOT NULL,
     user_id INTEGER NOT NULL,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE

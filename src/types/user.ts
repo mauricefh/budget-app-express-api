@@ -1,5 +1,6 @@
-export type User = {
-  id: number;
+import { Base } from "./base";
+
+export type User = Base & {
   email: string;
 };
 
