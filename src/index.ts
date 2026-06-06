@@ -5,6 +5,7 @@ import home from "./routes/home.route";
 import auth from "./routes/auth.route";
 import user from "./routes/user.route";
 import account from "./routes/account.route";
+import transaction from "./routes/transaction.route";
 
 // Setup
 const port = 3000;
@@ -22,6 +23,7 @@ app.use("/", home);
 app.use("/api/auth", auth);
 app.use("/api/user", user);
 app.use("/api/accounts", account);
+app.use("/api/transactions", transaction);
 
 app.listen(port, () => {
   console.log(`🚀 Server ready at: http://localhost:${port}`);
