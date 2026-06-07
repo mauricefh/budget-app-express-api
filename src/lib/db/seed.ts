@@ -4,6 +4,8 @@ import { createUser, hashPassword } from "@/services/auth.service";
 import { createAccount } from "@/services/account.service";
 import { CreateTransaction } from "@/types/transaction";
 import { createTransaction } from "@/services/transaction.service";
+import { createCategory } from "@/services/category.service";
+import { exit } from "node:process";
 
 console.log("🏁 Seed start");
 
@@ -13,13 +15,6 @@ db.exec(`DELETE FROM categories`);
 db.exec(`DELETE FROM transactions`);
 db.exec(`DELETE FROM accounts`);
 db.exec(`DELETE FROM users`);
-
-// db.prepare("INSERT INTO categories (name) VALUES (?)").run("Home");
-// db.prepare("INSERT INTO categories (name) VALUES (?)").run("Home");
-// db.prepare("INSERT INTO categories (name) VALUES (?)").run("Home");
-// db.prepare("INSERT INTO categories (name) VALUES (?)").run("Home");
-// db.prepare("INSERT INTO categories (name) VALUES (?)").run("Home");
-// db.prepare("INSERT INTO categories (name) VALUES (?)").run("Home");
 
 const email = "inbox@mauricefh.com";
 const password = "Password123@";
@@ -47,6 +42,54 @@ const kohoAccountId = createAccount({
   user_id: userId,
 });
 
+const categoryIncomeId = db
+  .prepare("INSERT INTO categories (name) VALUES (?)")
+  .run("Income").lastInsertRowid;
+const categoryHousingId = db
+  .prepare("INSERT INTO categories (name) VALUES (?)")
+  .run("Housing").lastInsertRowid;
+const categoryTransportationId = db
+  .prepare("INSERT INTO categories (name) VALUES (?)")
+  .run("Transportation").lastInsertRowid;
+const categoryFoodId = db
+  .prepare("INSERT INTO categories (name) VALUES (?)")
+  .run("Food").lastInsertRowid;
+const categoryUtilitiesId = db
+  .prepare("INSERT INTO categories (name) VALUES (?)")
+  .run("Utilities").lastInsertRowid;
+const categoryInsuranceId = db
+  .prepare("INSERT INTO categories (name) VALUES (?)")
+  .run("Insurance").lastInsertRowid;
+const categorySavingsId = db
+  .prepare("INSERT INTO categories (name) VALUES (?)")
+  .run("Savings").lastInsertRowid;
+const categoryEntertainementId = db
+  .prepare("INSERT INTO categories (name) VALUES (?)")
+  .run("Entertainment").lastInsertRowid;
+const categoryClothingId = db
+  .prepare("INSERT INTO categories (name) VALUES (?)")
+  .run("Clothing").lastInsertRowid;
+const categoryHealthcareId = db
+  .prepare("INSERT INTO categories (name) VALUES (?)")
+  .run("Healthcare").lastInsertRowid;
+const categoryDebtRepaymentId = db
+  .prepare("INSERT INTO categories (name) VALUES (?)")
+  .run("Debt Repayment").lastInsertRowid;
+const categoryBankFeesId = db
+  .prepare("INSERT INTO categories (name) VALUES (?)")
+  .run("Bank Fees").lastInsertRowid;
+const categoryWorkExpenseId = db
+  .prepare("INSERT INTO categories (name) VALUES (?)")
+  .run("Work Expense").lastInsertRowid;
+const categoryMiscellaneousId = db
+  .prepare("INSERT INTO categories (name) VALUES (?)")
+  .run("Miscellaneous").lastInsertRowid;
+
+const categoryUserCreatedId = createCategory({
+  name: "User Created Category",
+  user_id: userId,
+});
+
 // income - $1056 biweekly on tuesday on account id 2
 const newTransactions: CreateTransaction[] = [
   {
@@ -59,6 +102,7 @@ const newTransactions: CreateTransaction[] = [
     recurring_interval: 2,
     user_id: userId,
     account_id: tdCheckingAccountId,
+    category_id: Number(categoryIncomeId),
   },
   {
     name: "Digital Ocean",
@@ -70,6 +114,7 @@ const newTransactions: CreateTransaction[] = [
     recurring_interval: 1,
     user_id: userId,
     account_id: tdCheckingAccountId,
+    category_id: Number(categoryWorkExpenseId),
   },
   {
     name: "Spotify",
@@ -81,6 +126,7 @@ const newTransactions: CreateTransaction[] = [
     recurring_interval: 1,
     user_id: userId,
     account_id: tdCheckingAccountId,
+    category_id: Number(categoryEntertainementId),
   },
   {
     name: "Phone",
@@ -92,6 +138,7 @@ const newTransactions: CreateTransaction[] = [
     recurring_interval: 1,
     user_id: userId,
     account_id: tdCheckingAccountId,
+    category_id: Number(categoryUtilitiesId),
   },
   {
     name: "Quebec Taxes",
@@ -103,6 +150,7 @@ const newTransactions: CreateTransaction[] = [
     recurring_interval: 1,
     user_id: userId,
     account_id: tdCheckingAccountId,
+    category_id: Number(categoryDebtRepaymentId),
   },
   {
     name: "Credit Consolidation",
@@ -114,6 +162,7 @@ const newTransactions: CreateTransaction[] = [
     recurring_interval: 1,
     user_id: userId,
     account_id: tdCheckingAccountId,
+    category_id: Number(categoryDebtRepaymentId),
   },
   {
     name: "TD Account Fee",
@@ -125,6 +174,7 @@ const newTransactions: CreateTransaction[] = [
     recurring_interval: 1,
     user_id: userId,
     account_id: tdCheckingAccountId,
+    category_id: Number(categoryBankFeesId),
   },
   {
     name: "Lendcare",
@@ -136,6 +186,7 @@ const newTransactions: CreateTransaction[] = [
     recurring_interval: 2,
     user_id: userId,
     account_id: tdCheckingAccountId,
+    category_id: Number(categoryDebtRepaymentId),
   },
 ];
 

@@ -1,7 +1,10 @@
 import { Category, CreateCategory, UpdateCategory } from "@/types/category";
 import { db } from "../lib/db/database";
 
-export function getCategories(userId: number): Category[] {
+export function getCategories(
+  userId: number,
+  includeGlobal: boolean = true,
+): Category[] {
   const query = db.prepare("SELECT * FROM categories WHERE user_id = ?");
   return query.all(userId) as Category[];
 }
