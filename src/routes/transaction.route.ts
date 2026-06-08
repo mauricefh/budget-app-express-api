@@ -54,7 +54,6 @@ router.post("/", requireAuth, (req, res) => {
       recurring_interval,
       account_id,
       category_id,
-      group_id,
     } = req.body;
     if (!name) return res.status(400).send("Missing name");
     if (!amount) return res.status(400).send("Missing amount");
@@ -75,7 +74,6 @@ router.post("/", requireAuth, (req, res) => {
       user_id: userId,
       account_id,
       category_id,
-      group_id,
     } as CreateTransaction;
 
     const id = createTransaction(newTransaction);
@@ -108,7 +106,6 @@ router.put("/:id", requireAuth, (req, res) => {
       recurring_interval,
       account_id,
       category_id,
-      group_id,
     } = req.body;
 
     if (!name) return res.status(400).send("Missing name");
@@ -130,7 +127,6 @@ router.put("/:id", requireAuth, (req, res) => {
       user_id: userId,
       account_id,
       category_id,
-      group_id,
     } as UpdateTransaction;
 
     const changes = updateTransaction(id, updatedTransaction);

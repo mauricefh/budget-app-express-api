@@ -1,7 +1,6 @@
 import { Account } from "./account";
 import { Base } from "./base";
 import { Category } from "./category";
-import { Group } from "./group";
 import { User } from "./user";
 
 export type Transaction = Base & {
@@ -17,21 +16,19 @@ export type Transaction = Base & {
   user_id: number;
   account_id: number;
   category_id?: number;
-  group_id?: number;
   user?: User;
   account?: Account;
   category?: Category;
-  group?: Group;
 };
 
 export type CreateTransaction = Omit<
   Transaction,
-  "id" | "created_at" | "user" | "account" | "category" | "group"
+  "id" | "created_at" | "user" | "account" | "category"
 >;
 
 export type UpdateTransaction = Omit<
   Transaction,
-  "created_at" | "user" | "account" | "category" | "group"
+  "created_at" | "user" | "account" | "category"
 > & {
   name?: string;
   amount?: number;
@@ -44,5 +41,4 @@ export type UpdateTransaction = Omit<
   recurring_interval?: number;
   account_id?: number;
   category_id?: number;
-  group_id?: number;
 };

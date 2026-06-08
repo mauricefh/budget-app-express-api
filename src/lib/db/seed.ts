@@ -5,12 +5,10 @@ import { createAccount } from "@/services/account.service";
 import { CreateTransaction } from "@/types/transaction";
 import { createTransaction } from "@/services/transaction.service";
 import { createCategory } from "@/services/category.service";
-import { exit } from "node:process";
 
-console.log("🏁 Seed start");
+console.log("🏁 Seeding Starting");
 
 // Cleanup — use db directly delete in reverse order of dependencies
-db.exec(`DELETE FROM groups`);
 db.exec(`DELETE FROM categories`);
 db.exec(`DELETE FROM transactions`);
 db.exec(`DELETE FROM accounts`);
@@ -88,6 +86,7 @@ const categoryMiscellaneousId = db
 const categoryUserCreatedId = createCategory({
   name: "User Created Category",
   user_id: userId,
+  is_default: false,
 });
 
 // income - $1056 biweekly on tuesday on account id 2
@@ -220,4 +219,4 @@ for (let i = 0; i < 20; i++) {
   });
 }
 
-console.log("✅ Seed complete");
+console.log("✅ Seeding Completed Successfully");

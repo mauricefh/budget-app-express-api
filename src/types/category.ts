@@ -3,6 +3,7 @@ import { User } from "./user";
 
 export type Category = Base & {
   name: string;
+  is_default?: boolean;
   user_id?: number;
   user?: User;
 };
