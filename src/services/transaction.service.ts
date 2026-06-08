@@ -1,3 +1,4 @@
+import cache from "@/lib/cache";
 import { db } from "../lib/db/database";
 import {
   Transaction,
@@ -6,10 +7,16 @@ import {
 } from "../types/transaction";
 
 export function getTransactions(userId: number): Transaction[] {
+  const cacheKey = `transactions_${userId}`;
+  const cachedTransactions = cache.get<Transaction[]>(cacheKey);
+  if (cachedTransactions) return cachedTransactions;
+
   const query = db.prepare(
     "SELECT id, name, amount, description, date, type, recurring_frequency, recurring_day, recurring_month, recurring_interval, user_id, account_id, category_id FROM transactions WHERE user_id = ?",
   );
-  return query.all(userId) as Transaction[];
+  const transactions = query.all(userId) as Transaction[];
+  cache.set(cacheKey, transactions);
+  return transactions;
 }
 
 export function getTransactionById(
@@ -23,10 +30,12 @@ export function getTransactionById(
 }
 
 export function createTransaction(transaction: CreateTransaction): number {
+  const cacheKey = `transactions_${transaction.user_id}`;
+  cache.del(cacheKey);
   const query = db.prepare(
     "INSERT INTO transactions (name, amount, description, date, type, recurring_frequency, recurring_day, recurring_month, recurring_interval, user_id, account_id, category_id) VALUES (?,?,?,?,?,?,?,?,?, ?,?,?)",
   );
-  const result = query.run(
+  const newTransaction = query.run(
     transaction.name,
     transaction.amount,
     transaction.description,
@@ -40,17 +49,19 @@ export function createTransaction(transaction: CreateTransaction): number {
     transaction.account_id,
     transaction.category_id,
   );
-  return Number(result.lastInsertRowid);
+  return Number(newTransaction.lastInsertRowid);
 }
 
 export function updateTransaction(
   id: number,
   transaction: UpdateTransaction,
 ): number {
+  const cacheKey = `transactions_${transaction.user_id}`;
+  cache.del(cacheKey);
   const query = db.prepare(
     "UPDATE transactions SET name = ?, amount = ?, description = ?, date = ?, type = ?, recurring_frequency = ?, recurring_day = ?, recurring_month = ?, recurring_interval = ?, account_id = ?, category_id = ? WHERE id = ? AND user_id = ?",
   );
-  const result = query.run(
+  const updatedTransaction = query.run(
     transaction.name,
     transaction.amount,
     transaction.description,
@@ -65,12 +76,14 @@ export function updateTransaction(
     id,
     transaction.user_id,
   );
-  return Number(result.changes);
+  return Number(updatedTransaction.changes);
 }
 
 export function deleteTransaction(id: number, userId: number): void {
-  db.prepare("DELETE FROM transactions WHERE id = ? AND user_id = ?").run(
-    id,
-    userId,
+  const cacheKey = `transactions_${userId}`;
+  cache.del(cacheKey);
+  const query = db.prepare(
+    "DELETE FROM transactions WHERE id = ? AND user_id = ?",
   );
+  query.run(id, userId);
 }
