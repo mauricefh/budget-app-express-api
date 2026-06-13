@@ -8,40 +8,39 @@ import {
   updateTransaction,
 } from "../services/transaction.service";
 import { CreateTransaction, UpdateTransaction } from "../types/transaction";
+import { getParamId, getUserId } from "utils/request.utils";
+import { sendCreated, sendError, sendSuccess } from "utils/response.utils";
 const router = express.Router();
 
 router.get("/", requireAuth, (req, res) => {
   try {
-    const userId = req.user?.id;
-    if (!userId) throw new Error("userId not found");
+    const userId = getUserId(req);
     const transactions = getTransactions(userId);
-    return res.status(200).send(transactions);
+    return sendSuccess(res, transactions);
   } catch (err) {
     console.error(err);
-    res.status(500).send("Internal server error");
+    return sendError(res, 500, "Internal server error");
   }
 });
 
 router.get("/:id", requireAuth, (req, res) => {
   try {
-    const userId = req.user?.id;
-    if (!userId) throw new Error("userId not found");
-    const id = Number(req.params.id);
-    if (!id) return res.status(400).send("Missing id");
+    const userId = getUserId(req);
+    const id = getParamId(req);
+
     const transaction = getTransactionById(id, userId);
-    if (!transaction) return res.status(400).send("Transaction not found");
-    return res.status(200).send(transaction);
+    if (!transaction) return sendError(res, 404, "Transactions Not Found");
+
+    return sendSuccess(res, transaction);
   } catch (err) {
     console.error(err);
-    res.status(500).send("Internal server error");
+    return sendError(res, 500, "Internal server error");
   }
 });
 
 router.post("/", requireAuth, (req, res) => {
   try {
-    const userId = req.user?.id;
-    if (!userId) throw new Error("userId not found");
-
+    const userId = getUserId(req);
     const {
       name,
       amount,
@@ -55,11 +54,11 @@ router.post("/", requireAuth, (req, res) => {
       account_id,
       category_id,
     } = req.body;
-    if (!name) return res.status(400).send("Missing name");
-    if (!amount) return res.status(400).send("Missing amount");
-    if (!date) return res.status(400).send("Missing date");
-    if (!type) return res.status(400).send("Missing type");
-    if (!account_id) return res.status(400).send("Missing account_id");
+    if (!name) return sendError(res, 400, "Missing name");
+    if (!amount) return sendError(res, 400, "Missing amount");
+    if (!date) return sendError(res, 400, "Missing date");
+    if (!type) return sendError(res, 400, "Missing type");
+    if (!account_id) return sendError(res, 400, "Missing account_id");
 
     const newTransaction = {
       name,
@@ -77,22 +76,17 @@ router.post("/", requireAuth, (req, res) => {
     } as CreateTransaction;
 
     const id = createTransaction(newTransaction);
-    return res.status(201).send({
-      id,
-      message: "Transaction created successfully",
-    });
+    return sendCreated(res, { id });
   } catch (err) {
     console.error(err);
-    res.status(500).send("Internal server error");
+    return sendError(res, 500, "Internal server error");
   }
 });
 
 router.put("/:id", requireAuth, (req, res) => {
   try {
-    const id = Number(req.params.id);
-    if (!id || isNaN(id)) throw new Error("Invalid account id");
-    const userId = req.user?.id;
-    if (!userId) throw new Error("userId not found");
+    const userId = getUserId(req);
+    const id = getParamId(req);
 
     const {
       name,
@@ -108,11 +102,11 @@ router.put("/:id", requireAuth, (req, res) => {
       category_id,
     } = req.body;
 
-    if (!name) return res.status(400).send("Missing name");
-    if (!amount) return res.status(400).send("Missing amount");
-    if (!date) return res.status(400).send("Missing date");
-    if (!type) return res.status(400).send("Missing type");
-    if (!account_id) return res.status(400).send("Missing account_id");
+    if (!name) return sendError(res, 400, "Missing name");
+    if (!amount) return sendError(res, 400, "Missing amount");
+    if (!date) return sendError(res, 400, "Missing date");
+    if (!type) return sendError(res, 400, "Missing type");
+    if (!account_id) return sendError(res, 400, "Missing account_id");
 
     const updatedTransaction = {
       name,
@@ -130,30 +124,23 @@ router.put("/:id", requireAuth, (req, res) => {
     } as UpdateTransaction;
 
     const changes = updateTransaction(id, updatedTransaction);
-    if (changes === 0) return res.status(404).send("Transaction not found");
-    return res.status(200).send({
-      id,
-      message: "Transaction updated successfully",
-    });
+    if (changes === 0) return sendError(res, 404, "Transaction not found");
+    return sendSuccess(res, { id });
   } catch (err) {
     console.error(err);
-    res.status(500).send("Internal server error");
+    return sendError(res, 500, "Internal server error");
   }
 });
 
 router.delete("/:id", requireAuth, (req, res) => {
   try {
-    const userId = req.user?.id;
-    if (!userId) throw new Error("userId not found");
-    const id = Number(req.params.id);
-    if (!id || isNaN(id)) return res.status(400).send("Invalid id");
+    const userId = getUserId(req);
+    const id = getParamId(req);
     deleteTransaction(id, userId);
-    return res
-      .status(200)
-      .send({ message: "Transaction deleted successfully" });
+    return sendSuccess(res);
   } catch (err) {
     console.error(err);
-    res.status(500).send("Internal server error");
+    return sendError(res, 500, "Internal server error");
   }
 });
 

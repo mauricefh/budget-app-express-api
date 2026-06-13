@@ -3,7 +3,7 @@ import { User } from "./user";
 
 export type Account = Base & {
   name: string;
-  type: "cash" | "checking" | "saving" | "credit" | "loan";
+  type: "cash" | "chequing" | "saving" | "credit" | "loan";
   user_id: number;
   user?: User;
 };

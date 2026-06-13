@@ -1,8 +1,8 @@
+import { Env } from "@/types/environment";
 import { db } from "./database";
 
-console.log("🏁 Creating Database and Table Start");
-
-db.exec(`
+export default function createDatabaseFromSchema(env: Env) {
+  db.exec(`
   CREATE TABLE IF NOT EXISTS users (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     email TEXT NOT NULL UNIQUE,
@@ -11,9 +11,9 @@ db.exec(`
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP
   )
 `);
-db.exec(`CREATE INDEX IF NOT EXISTS idx_users_user_email ON users(email)`);
+  db.exec(`CREATE INDEX IF NOT EXISTS idx_users_user_email ON users(email)`);
 
-db.exec(`
+  db.exec(`
   CREATE TABLE IF NOT EXISTS users_sessions (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     token TEXT NOT NULL UNIQUE,
@@ -23,23 +23,25 @@ db.exec(`
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
   )
 `);
-db.exec(
-  `CREATE INDEX IF NOT EXISTS idx_users_sessions_user_token ON users_sessions(token)`,
-);
+  db.exec(
+    `CREATE INDEX IF NOT EXISTS idx_users_sessions_user_token ON users_sessions(token)`,
+  );
 
-db.exec(`
+  db.exec(`
   CREATE TABLE IF NOT EXISTS accounts (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     name TEXT NOT NULL,
-    type TEXT CHECK(type IN ('cash', 'checking', 'saving', 'credit', 'loan')) NOT NULL,
+    type TEXT CHECK(type IN ('cash', 'chequing', 'saving', 'credit', 'loan')) NOT NULL,
     user_id INTEGER NOT NULL,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
   )
 `);
-db.exec(`CREATE INDEX IF NOT EXISTS idx_accounts_user_id ON accounts(user_id)`);
+  db.exec(
+    `CREATE INDEX IF NOT EXISTS idx_accounts_user_id ON accounts(user_id)`,
+  );
 
-db.exec(`
+  db.exec(`
   CREATE TABLE IF NOT EXISTS categories(
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     name TEXT NOT NULL,
@@ -50,7 +52,7 @@ db.exec(`
   )
 `);
 
-db.exec(`
+  db.exec(`
   CREATE TABLE IF NOT EXISTS transactions(
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     name TEXT NOT NULL,
@@ -71,11 +73,10 @@ db.exec(`
     FOREIGN KEY (category_id) REFERENCES categories(id) ON DELETE SET NULL
   )
 `);
-db.exec(
-  `CREATE INDEX IF NOT EXISTS idx_transactions_user_id ON transactions(user_id)`,
-);
-db.exec(
-  `CREATE INDEX IF NOT EXISTS idx_transactions_account_id ON transactions(account_id)`,
-);
-
-console.log("✅ Creating Database and Table Successfully");
+  db.exec(
+    `CREATE INDEX IF NOT EXISTS idx_transactions_user_id ON transactions(user_id)`,
+  );
+  db.exec(
+    `CREATE INDEX IF NOT EXISTS idx_transactions_account_id ON transactions(account_id)`,
+  );
+}

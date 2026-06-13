@@ -7,24 +7,25 @@ import {
   verifyPassword,
 } from "../services/auth.service";
 import { createSession, deleteSession } from "../services/session.service";
+import { sendCreated, sendError, sendSuccess } from "utils/response.utils";
 const router = express.Router();
 
 router.post("/register", async (req, res) => {
   try {
     const { email, password } = req.body;
-    if (!email) return res.status(400).send("Missing email field");
-    if (!password) return res.status(400).send("Missing password field");
+    if (!email) return sendError(res, 400, "Missing email");
+    if (!password) return sendError(res, 400, "Missing password");
     const user = findUserByEmail(email);
     if (user)
-      return res.status(409).send(`User with email: ${email} already exists`);
+      return sendError(res, 409, `User with email: ${email} already exists`);
 
     const { hash, salt } = await hashPassword(password);
 
-    const newUserId = createUser(email, hash, salt);
-    res.status(201).json({ id: newUserId });
+    const id = createUser(email, hash, salt);
+    return sendCreated(res, { id });
   } catch (err) {
     console.error(err);
-    res.status(500).send("Internal server error");
+    return sendError(res, 500, "Internal server error");
   }
 });
 
@@ -34,14 +35,14 @@ router.post("/login", async (req, res) => {
     const { email, password } = req.body;
 
     // 2. Validate they exist
-    if (!email) return res.status(400).send("Missing email field");
-    if (!password) return res.status(400).send("Missing password field");
+    if (!email) return sendError(res, 400, "Missing email");
+    if (!password) return sendError(res, 400, "Missing password");
 
     // 3. Find user with credentials
     const user = findUserByEmailWithCredentials(email);
 
     // 4. If no user — return 401
-    if (!user) return res.status(401).send("Wrong email or password");
+    if (!user) return sendError(res, 401, "Wrong email or password");
 
     // 5. Verify password
     const isPasswordValid = await verifyPassword(
@@ -51,12 +52,11 @@ router.post("/login", async (req, res) => {
     );
 
     // 6. If wrong — return 401
-    if (!isPasswordValid)
-      return res.status(401).send("Wrong email or password");
+    if (!isPasswordValid) return sendError(res, 401, "Wrong email or password");
 
     // 7. If correct — create session, generate cookies and return 200
     const token = createSession(user.id);
-    res
+    return res
       .status(200)
       .cookie("session", token, {
         httpOnly: true,
@@ -67,20 +67,20 @@ router.post("/login", async (req, res) => {
       .json({ message: "Login successful" });
   } catch (err) {
     console.error(err);
-    res.status(500).send("Internal server error");
+    return sendError(res, 500, "Internal server error");
   }
 });
 
 router.post("/logout", async (req, res) => {
   try {
     const token = req.cookies.session;
-    if (!token) return res.status(400).send("No session found");
+    if (!token) sendError(res, 400, "No session found");
     deleteSession(token);
     res.clearCookie("session");
-    res.status(200).json({ message: "Logged out seccessfully" });
+    return sendSuccess(res);
   } catch (err) {
     console.error(err);
-    res.status(500).send("Internal server error");
+    return sendError(res, 500, "Internal server error");
   }
 });
 

@@ -6,48 +6,43 @@ import {
   getAccounts,
 } from "../services/account.service";
 import { CreateAccount } from "../types/account";
+import { getParamId, getUserId } from "utils/request.utils";
+import { sendCreated, sendError, sendSuccess } from "utils/response.utils";
 const router = express.Router();
 
 router.get("/", requireAuth, (req, res) => {
   try {
-    const userId = req.user?.id;
-    if (!userId) throw new Error("User ID Not found. Are you connected?");
-
+    const userId = getUserId(req);
     const accounts = getAccounts(userId);
-    console.log("account", accounts);
-    return res.status(200).send(accounts);
+    return sendSuccess(res, accounts);
   } catch (err) {
     console.error(err);
-    res.status(500).send("Internal server error");
+    return sendError(res, 500, "Internal server error");
   }
 });
 
 router.post("/", requireAuth, (req, res) => {
   try {
-    const userId = req.user?.id;
-    if (!userId) throw new Error("User ID Not found. Are you connected?");
+    const userId = getUserId(req);
     const { name, type } = req.body;
     const newAccount: CreateAccount = { name, type, user_id: userId };
-    const account = createAccount(newAccount);
-    return res
-      .status(201)
-      .send({ account: account, message: "Account created successfully" });
+    const id = createAccount(newAccount);
+    return sendCreated(res, { id });
   } catch (err) {
     console.error(err);
-    res.status(500).send("Internal server error");
+    return sendError(res, 500, "Internal server error");
   }
 });
 
 router.delete("/:id", requireAuth, (req, res) => {
   try {
-    const id = Number(req.params.id);
-    const userId = req.user?.id;
-    if (!id || isNaN(id) || !userId) throw new Error("Invalid account id");
+    const userId = getUserId(req);
+    const id = getParamId(req);
     deleteAccount(id, userId);
-    return res.status(200).send({ message: "Account deleted successfully" });
+    return sendSuccess(res);
   } catch (err) {
     console.error(err);
-    res.status(500).send("Internal server error");
+    return sendError(res, 500, "Internal server error");
   }
 });
 

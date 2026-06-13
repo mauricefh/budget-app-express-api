@@ -1,5 +1,4 @@
 import "./config";
-import "./lib/db/schema";
 import express from "express";
 import cookieParser from "cookie-parser";
 import home from "./routes/home.route";
@@ -9,6 +8,11 @@ import account from "./routes/account.route";
 import transaction from "./routes/transaction.route";
 import category from "./routes/category.route";
 import { startRecurringJob } from "./jobs/recurring.job";
+import startup from "./startup";
+import { Env } from "./types/environment";
+
+const env = process.env.NODE_ENV as Env;
+startup(env);
 
 // Setup
 const app = express();
