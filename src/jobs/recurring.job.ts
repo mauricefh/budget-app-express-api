@@ -1,6 +1,5 @@
 import cron from "node-cron";
 import { db } from "../lib/db/database";
-import { Request } from "express";
 import { Transaction } from "../types/transaction";
 import { createTransaction } from "../services/transaction.service";
 
@@ -20,8 +19,14 @@ import { createTransaction } from "../services/transaction.service";
 
 export function startRecurringJob() {
   cron.schedule("0 0 * * *", () => {
-    // Find all recurring transactions due today based on frequency and schedule
-    const query = db.prepare(`
+    createRecurringTransations();
+    cleanupSessions();
+  });
+}
+
+function createRecurringTransations() {
+  // Find all recurring transactions due today based on frequency and schedule
+  const query = db.prepare(`
     SELECT * FROM transactions 
     WHERE recurring_frequency IS NOT NULL
     AND (
@@ -38,20 +43,26 @@ export function startRecurringJob() {
       AND recurring_month = CAST(strftime('%m', 'now') AS INTEGER))
   )`);
 
-    const transactions = query.all() as Transaction[];
-    const date = new Date().toISOString().split("T")[0];
-    let updatedEntires = 0;
-    for (let transaction of transactions) {
-      createTransaction({
-        ...transaction,
-        date: date,
-        recurring_frequency: undefined,
-        recurring_day: undefined,
-        recurring_month: undefined,
-        recurring_interval: undefined,
-      });
-      updatedEntires++;
-    }
-    console.log(`updated ${updatedEntires} entries`);
-  });
+  const transactions = query.all() as Transaction[];
+  const date = new Date().toISOString().split("T")[0];
+  let updatedEntires = 0;
+  for (let transaction of transactions) {
+    createTransaction({
+      ...transaction,
+      date: date,
+      recurring_frequency: undefined,
+      recurring_day: undefined,
+      recurring_month: undefined,
+      recurring_interval: undefined,
+    });
+    updatedEntires++;
+  }
+  console.log(`updated ${updatedEntires} entries`);
+}
+
+function cleanupSessions() {
+  const result = db
+    .prepare(`DELETE FROM users_sessions WHERE expire_at <= datetime('now')`)
+    .run();
+  console.log(`🧹 Cleaned up ${result.changes} expired sessions`);
 }

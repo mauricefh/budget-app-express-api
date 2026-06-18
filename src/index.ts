@@ -11,6 +11,7 @@ import { startRecurringJob } from "./jobs/recurring.job";
 import startup from "./startup";
 import { Env } from "./types/environment";
 
+// Check that all env are set and create/update database and seed it
 const env = process.env.NODE_ENV as Env;
 startup(env);
 

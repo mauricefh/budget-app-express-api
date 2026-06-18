@@ -8,19 +8,28 @@ import {
 } from "../services/auth.service";
 import { createSession, deleteSession } from "../services/session.service";
 import { sendCreated, sendError, sendSuccess } from "utils/response.utils";
+import { loginSchema, registerSchema } from "@/lib/schema";
 const router = express.Router();
 
 router.post("/register", async (req, res) => {
   try {
-    const { email, password } = req.body;
-    if (!email) return sendError(res, 400, "Missing email");
-    if (!password) return sendError(res, 400, "Missing password");
+    // Validation
+    const result = registerSchema.safeParse(req.body);
+    if (!result.success)
+      return sendError(res, 400, result.error.issues[0].message);
+
+    // Data
+    const { email, password } = result.data;
+
+    // Check if user already existe
     const user = findUserByEmail(email);
     if (user)
       return sendError(res, 409, `User with email: ${email} already exists`);
 
+    // Transformation
     const { hash, salt } = await hashPassword(password);
 
+    // Creation
     const id = createUser(email, hash, salt);
     return sendCreated(res, { id });
   } catch (err) {
@@ -31,30 +40,31 @@ router.post("/register", async (req, res) => {
 
 router.post("/login", async (req, res) => {
   try {
-    // 1. Get email and password from body
-    const { email, password } = req.body;
+    // Validation
+    const result = loginSchema.safeParse(req.body);
+    if (!result.success)
+      return sendError(res, 400, result.error.issues[0].message);
 
-    // 2. Validate they exist
-    if (!email) return sendError(res, 400, "Missing email");
-    if (!password) return sendError(res, 400, "Missing password");
+    // Data
+    const { email, password } = result.data;
 
-    // 3. Find user with credentials
+    // Find user with credentials
     const user = findUserByEmailWithCredentials(email);
 
-    // 4. If no user — return 401
+    // If no user — return 401
     if (!user) return sendError(res, 401, "Wrong email or password");
 
-    // 5. Verify password
+    // Verify password
     const isPasswordValid = await verifyPassword(
       password,
       user.salt,
       user.password,
     );
 
-    // 6. If wrong — return 401
+    // If wrong — return 401
     if (!isPasswordValid) return sendError(res, 401, "Wrong email or password");
 
-    // 7. If correct — create session, generate cookies and return 200
+    // If correct — create session, generate cookies and return 200
     const token = createSession(user.id);
     return res
       .status(200)
