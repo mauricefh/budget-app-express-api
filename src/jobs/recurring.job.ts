@@ -25,6 +25,7 @@ export function startRecurringJob() {
 }
 
 function createRecurringTransations() {
+  console.info("Creating recurring transaction...");
   // Find all recurring transactions due today based on frequency and schedule
   const query = db.prepare(`
     SELECT * FROM transactions 
@@ -61,6 +62,7 @@ function createRecurringTransations() {
 }
 
 function cleanupSessions() {
+  console.info("Cleaning expired users sessions...");
   const result = db
     .prepare(`DELETE FROM users_sessions WHERE expire_at <= datetime('now')`)
     .run();

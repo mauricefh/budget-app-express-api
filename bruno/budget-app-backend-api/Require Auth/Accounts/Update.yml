@@ -5,7 +5,14 @@ info:
 
 http:
   method: PUT
-  url: http://localhost:3000/api/accounts
+  url: http://localhost:3000/api/accounts/5
+  body:
+    type: json
+    data: |-
+      {
+        "name": "KOHO",
+        "type": "credit"
+      }
   auth: inherit
 
 settings:

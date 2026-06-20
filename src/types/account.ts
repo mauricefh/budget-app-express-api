@@ -9,3 +9,8 @@ export type Account = Base & {
 };
 
 export type CreateAccount = Omit<Account, "id" | "created_at" | "user">;
+
+export type UpdateAccount = Omit<Account, "created_at" | "user"> & {
+  name?: string;
+  type?: "cash" | "chequing" | "saving" | "credit" | "loan";
+};

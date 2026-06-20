@@ -1,6 +1,6 @@
 import cache from "@/lib/cache";
 import { db } from "../lib/db/database";
-import { Account, CreateAccount } from "../types/account";
+import { Account, CreateAccount, UpdateAccount } from "../types/account";
 
 export function getAccounts(userId: number): Account[] {
   const cacheKey = `accounts_${userId}`;
@@ -20,6 +20,21 @@ export function createAccount(account: CreateAccount): number {
   );
   const newAccount = query.run(account.name, account.type, account.user_id);
   return Number(newAccount.lastInsertRowid);
+}
+
+export function updateAccount(id: number, account: UpdateAccount): number {
+  const cacheKey = `accounts_${account.user_id}`;
+  cache.del(cacheKey);
+  const query = db.prepare(
+    "UPDATE accounts SET name = ?, type = ? WHERE id = ? AND user_id = ?",
+  );
+  const updatedAccount = query.run(
+    account.name,
+    account.type,
+    id,
+    account.user_id,
+  );
+  return Number(updatedAccount.changes);
 }
 
 export function deleteAccount(id: number, userId: number): void {
