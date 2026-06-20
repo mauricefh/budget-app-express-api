@@ -20,3 +20,7 @@ export const accountSchema = z.object({
     "Please select an account type",
   ),
 });
+
+export const categorySchema = z.object({
+  name: z.string().min(1, "Category name cannot be empty"),
+});
