@@ -12,3 +12,11 @@ export const loginSchema = z.object({
   email: z.email("Email is not in a valid format").trim().toLowerCase(),
   password: z.string().min(1, "Password is required"),
 });
+
+export const accountSchema = z.object({
+  name: z.string().min(1, "Account name cannot be empty"),
+  type: z.enum(
+    ["cash", "chequing", "saving", "credit", "loan"],
+    "Please select an account type",
+  ),
+});

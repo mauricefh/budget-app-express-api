@@ -8,6 +8,7 @@ import {
 import { CreateAccount } from "../types/account";
 import { getParamId, getUserId } from "utils/request.utils";
 import { sendCreated, sendError, sendSuccess } from "utils/response.utils";
+import { accountSchema } from "@/lib/schema";
 const router = express.Router();
 
 router.get("/", requireAuth, (req, res) => {
@@ -24,7 +25,11 @@ router.get("/", requireAuth, (req, res) => {
 router.post("/", requireAuth, (req, res) => {
   try {
     const userId = getUserId(req);
-    const { name, type } = req.body;
+    const result = accountSchema.safeParse(req.body);
+    if (!result.success)
+      return sendError(res, 400, result.error.issues[0].message);
+
+    const { name, type } = result.data;
     const newAccount: CreateAccount = { name, type, user_id: userId };
     const id = createAccount(newAccount);
     return sendCreated(res, { id });

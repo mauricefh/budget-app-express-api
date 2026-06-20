@@ -11,7 +11,7 @@ http:
     data: |-
       {
         "name": "TD",
-        "type": "checking"
+        "type": "chequing"
       }
   auth: inherit
 
