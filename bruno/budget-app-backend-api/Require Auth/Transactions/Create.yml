@@ -19,8 +19,7 @@ http:
         "recurring_day": null,
         "recurring_interval": null, 
         "account_id": 1,
-        "category_id": null,
-        "group_id": null
+        "category_id": null
       }
   auth: inherit
 

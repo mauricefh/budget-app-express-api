@@ -10,6 +10,7 @@ import {
 import { CreateTransaction, UpdateTransaction } from "../types/transaction";
 import { getParamId, getUserId } from "utils/request.utils";
 import { sendCreated, sendError, sendSuccess } from "utils/response.utils";
+import { transactionSchema } from "@/lib/schema";
 const router = express.Router();
 
 router.get("/", requireAuth, (req, res) => {
@@ -41,6 +42,10 @@ router.get("/:id", requireAuth, (req, res) => {
 router.post("/", requireAuth, (req, res) => {
   try {
     const userId = getUserId(req);
+    const result = transactionSchema.safeParse(req.body);
+    if (!result.success)
+      return sendError(res, 400, result.error.issues[0].message);
+
     const {
       name,
       amount,
@@ -53,12 +58,7 @@ router.post("/", requireAuth, (req, res) => {
       recurring_interval,
       account_id,
       category_id,
-    } = req.body;
-    if (!name) return sendError(res, 400, "Missing name");
-    if (!amount) return sendError(res, 400, "Missing amount");
-    if (!date) return sendError(res, 400, "Missing date");
-    if (!type) return sendError(res, 400, "Missing type");
-    if (!account_id) return sendError(res, 400, "Missing account_id");
+    } = result.data;
 
     const newTransaction = {
       name,
@@ -72,7 +72,7 @@ router.post("/", requireAuth, (req, res) => {
       recurring_interval,
       user_id: userId,
       account_id,
-      category_id,
+      category_id: category_id ?? 1,
     } as CreateTransaction;
 
     const id = createTransaction(newTransaction);

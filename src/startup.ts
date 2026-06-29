@@ -6,8 +6,10 @@ import seedDatabase from "./lib/db/seed";
 export default function startup(env: Env) {
   // Check environement variable
   validateEnv(env);
+
   // Create database
   createDatabaseFromSchema(env);
+
   // Seed database
-  if (process.env.SEED_ON_STARTUP === "true") seedDatabase(env);
+  seedDatabase(env);
 }

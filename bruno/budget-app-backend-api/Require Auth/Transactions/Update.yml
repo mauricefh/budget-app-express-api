@@ -5,7 +5,7 @@ info:
 
 http:
   method: PUT
-  url: http://localhost:3000/api/transactions/1
+  url: http://localhost:3000/api/transactions/9
   body:
     type: json
     data: |-
@@ -19,8 +19,7 @@ http:
         "recurring_day": null,
         "recurring_interval": null, 
         "account_id": 1,
-        "category_id": null,
-        "group_id": null
+        "category_id": null
       }
   auth: inherit
 

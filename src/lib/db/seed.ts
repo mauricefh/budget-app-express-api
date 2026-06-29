@@ -11,6 +11,7 @@ import { Account } from "@/types/account";
 import { Category } from "@/types/category";
 
 const globalCategories = [
+  "Uncategorized",
   "Income",
   "Housing",
   "Transportation",
@@ -28,8 +29,8 @@ const globalCategories = [
 ];
 
 export default async function seedDatabase(env: Env) {
-  if (env === "development") {
-    deleteDatabase();
+  if (env === "development" && process.env.SEED_ON_STARTUP === "true") {
+    if (process.env.DELETE_DB_ON_STARTUP === "true") deleteDatabase();
     const userId = await createTestUser();
     const createdNewAccounts = createTestAccounts(userId);
     const accounts = getAccounts(userId);
@@ -54,8 +55,8 @@ function createGlobalCategories() {
 
 // Generate a user for test purpose
 async function createTestUser(): Promise<number> {
-  const email = process.env.EMAIL!;
-  const password = process.env.PASSWORD!;
+  const email = "test@example.com";
+  const password = "Password123@";
   const { hash, salt } = await hashPassword(password);
   const userId = createUser(email, hash, salt);
   return userId;

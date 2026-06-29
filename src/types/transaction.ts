@@ -15,7 +15,7 @@ export type Transaction = Base & {
   recurring_interval?: number;
   user_id: number;
   account_id: number;
-  category_id?: number;
+  category_id: number;
   user?: User;
   account?: Account;
   category?: Category;
