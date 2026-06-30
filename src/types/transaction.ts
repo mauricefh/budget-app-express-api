@@ -6,6 +6,7 @@ import { User } from "./user";
 export type Transaction = Base & {
   name: string;
   amount: number;
+  formatted_amount: string;
   description?: string;
   date: string;
   type: "income" | "expense";
@@ -23,12 +24,12 @@ export type Transaction = Base & {
 
 export type CreateTransaction = Omit<
   Transaction,
-  "id" | "created_at" | "user" | "account" | "category"
+  "id" | "formatted_amount" | "created_at" | "user" | "account" | "category"
 >;
 
 export type UpdateTransaction = Omit<
   Transaction,
-  "created_at" | "user" | "account" | "category"
+  "formatted_amount" | "created_at" | "user" | "account" | "category"
 > & {
   name?: string;
   amount?: number;

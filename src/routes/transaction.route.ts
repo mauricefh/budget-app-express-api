@@ -11,12 +11,16 @@ import { CreateTransaction, UpdateTransaction } from "../types/transaction";
 import { getParamId, getUserId } from "utils/request.utils";
 import { sendCreated, sendError, sendSuccess } from "utils/response.utils";
 import { transactionSchema } from "@/lib/schema";
+import { formatCurrencyForDisplay } from "utils/format.utils";
 const router = express.Router();
 
 router.get("/", requireAuth, (req, res) => {
   try {
     const userId = getUserId(req);
-    const transactions = getTransactions(userId);
+    const transactions = getTransactions(userId).map((t) => ({
+      ...t,
+      formatted_amount: formatCurrencyForDisplay(t.amount),
+    }));
     return sendSuccess(res, transactions);
   } catch (err) {
     console.error(err);
@@ -30,9 +34,12 @@ router.get("/:id", requireAuth, (req, res) => {
     const id = getParamId(req);
 
     const transaction = getTransactionById(id, userId);
-    if (!transaction) return sendError(res, 404, "Transactions Not Found");
+    if (!transaction) return sendError(res, 404, "Transaction not found");
 
-    return sendSuccess(res, transaction);
+    return sendSuccess(res, {
+      ...transaction,
+      formatted_amount: formatCurrencyForDisplay(transaction.amount),
+    });
   } catch (err) {
     console.error(err);
     return sendError(res, 500, "Internal server error");

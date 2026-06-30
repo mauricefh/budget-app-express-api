@@ -11,16 +11,14 @@ import { CreateAccount, UpdateAccount } from "../types/account";
 import { getParamId, getUserId } from "utils/request.utils";
 import { sendCreated, sendError, sendSuccess } from "utils/response.utils";
 import { accountSchema } from "@/lib/schema";
+import { formatCurrencyForDisplay } from "utils/format.utils";
 const router = express.Router();
 
 router.get("/summary", requireAuth, (req, res) => {
   try {
     const userId = getUserId(req);
     const { net_worth } = getAccountsSummary(userId);
-    const net_worth_formatted = new Intl.NumberFormat("en-CA", {
-      style: "currency",
-      currency: "CAD",
-    }).format(net_worth / 100);
+    const net_worth_formatted = formatCurrencyForDisplay(net_worth);
     return sendSuccess(res, { net_worth, net_worth_formatted });
   } catch (err) {
     console.error(err);
@@ -31,7 +29,10 @@ router.get("/summary", requireAuth, (req, res) => {
 router.get("/", requireAuth, (req, res) => {
   try {
     const userId = getUserId(req);
-    const accounts = getAccounts(userId);
+    const accounts = getAccounts(userId).map((account) => ({
+      ...account,
+      formatted_balance: formatCurrencyForDisplay(account.balance),
+    }));
     return sendSuccess(res, accounts);
   } catch (err) {
     console.error(err);
