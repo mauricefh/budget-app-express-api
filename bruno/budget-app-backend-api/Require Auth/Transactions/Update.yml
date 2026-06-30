@@ -11,13 +11,14 @@ http:
     data: |-
       {
         "name": "Grocery Store",
-        "amount": 8548,
+        "amount": 4599,
         "description": "Weekly groceries",
         "date": "2026-05-31",
         "type": "expense",
         "recurring_frequency": null,
         "recurring_day": null,
-        "recurring_interval": null, 
+        "recurring_month": null,
+        "recurring_interval": null,
         "account_id": 1,
         "category_id": null
       }

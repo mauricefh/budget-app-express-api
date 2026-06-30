@@ -88,6 +88,10 @@ router.put("/:id", requireAuth, (req, res) => {
     const userId = getUserId(req);
     const id = getParamId(req);
 
+    const result = transactionSchema.safeParse(req.body);
+    if (!result.success)
+      return sendError(res, 400, result.error.issues[0].message);
+
     const {
       name,
       amount,
@@ -100,13 +104,7 @@ router.put("/:id", requireAuth, (req, res) => {
       recurring_interval,
       account_id,
       category_id,
-    } = req.body;
-
-    if (!name) return sendError(res, 400, "Missing name");
-    if (!amount) return sendError(res, 400, "Missing amount");
-    if (!date) return sendError(res, 400, "Missing date");
-    if (!type) return sendError(res, 400, "Missing type");
-    if (!account_id) return sendError(res, 400, "Missing account_id");
+    } = result.data;
 
     const updatedTransaction = {
       name,
@@ -120,7 +118,7 @@ router.put("/:id", requireAuth, (req, res) => {
       recurring_interval,
       user_id: userId,
       account_id,
-      category_id,
+      category_id: category_id ?? 1,
     } as UpdateTransaction;
 
     const changes = updateTransaction(id, updatedTransaction);
