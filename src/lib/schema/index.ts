@@ -19,12 +19,12 @@ export const loginSchema = z.object({
 });
 
 export const accountSchema = z.object({
-  name: z.string().min(1, "Name cannot be empty"),
-  type: z.enum(accountTypeEnum, "Please select an account type"),
+  name: z.string().min(1, "Name is required"),
+  type: z.enum(accountTypeEnum, "Account type is required"),
 });
 
 export const categorySchema = z.object({
-  name: z.string().min(1, "Name cannot be empty"),
+  name: z.string().min(1, "Name is required"),
 });
 
 /**
@@ -43,27 +43,66 @@ export const categorySchema = z.object({
  * account_id: required
  * category_id: default to Uncategorized
  */
-export const transactionSchema = z.object({
-  name: z.string().min(1, "Name cannot be empty"),
-  amount: z
-    .number("Amount must be a number")
-    .positive("Amount must be greater than 0"),
-  date: z.string().regex(/\d{4}-\d{2}-\d{2}/gm),
-  type: z.enum(transactionTypeEnum, "Type must be either income or expense"),
-  account_id: z.number("Account id must be provided").min(1),
-  category_id: z
-    .number("Category id must be provided")
-    .min(1)
-    .default(1)
-    .nullish(),
-  recurring_frequency: z
-    .enum(
-      transactionRecurringFrequencyEnum,
-      "Please select a recurring frequency",
-    )
-    .nullish(),
-  description: z.string().nullish(),
-  recurring_day: z.number().nullish(),
-  recurring_month: z.number().nullish(),
-  recurring_interval: z.number().nullish(),
-});
+let message = "";
+export const transactionSchema = z
+  .object({
+    name: z.string().min(1, "Name is required"),
+    description: z.string().nullish(),
+    amount: z
+      .number("Amount must be a number")
+      .positive("Amount must be greater than 0"),
+    date: z.string().regex(/\d{4}-\d{2}-\d{2}/gm),
+    type: z.enum(transactionTypeEnum, "Type must be either income or expense"),
+    account_id: z.number("Account id required").min(1),
+    category_id: z.number("Category is required").min(1).default(1).nullish(),
+    recurring_frequency: z
+      .enum(
+        transactionRecurringFrequencyEnum,
+        "Please select a recurring frequency",
+      )
+      .nullish(),
+    recurring_day: z.number().nullish(),
+    recurring_month: z.number().nullish(),
+    recurring_interval: z.number().nullish(),
+  })
+  .refine(
+    (data) => {
+      if (data.recurring_frequency === "weekly") {
+        if (
+          data.recurring_day &&
+          data.recurring_day >= 1 &&
+          data.recurring_day <= 7
+        ) {
+          message =
+            "Recurring day must be between monday and sunday when recurring frequency is weekly";
+        }
+      } else if (data.recurring_frequency === "monthly") {
+        if (
+          data.recurring_day &&
+          data.recurring_day >= 1 &&
+          data.recurring_day <= 31
+        ) {
+          message =
+            "Recurring day must be between 1 and 31 when recurring frequency is monthly";
+        }
+      } else if (data.recurring_frequency === "yearly") {
+        if (
+          data.recurring_day &&
+          data.recurring_day >= 1 &&
+          data.recurring_day <= 31
+        ) {
+          message =
+            "Recurring day must be between 1 and 31 when recurring frequency is yearly";
+        }
+        if (
+          data.recurring_month &&
+          data.recurring_month >= 1 &&
+          data.recurring_month <= 12
+        ) {
+          message =
+            "Recurring month must be selected when recurring frequency is yearly";
+        }
+      }
+    },
+    { error: message, path: ["recurring_frequency"] },
+  );
