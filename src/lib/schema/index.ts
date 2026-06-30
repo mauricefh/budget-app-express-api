@@ -1,4 +1,9 @@
 import * as z from "zod";
+import {
+  accountTypeEnum,
+  transactionRecurringFrequencyEnum,
+  transactionTypeEnum,
+} from "constant";
 
 export const registerSchema = z.object({
   email: z.email("Email is not in a valid format").trim().toLowerCase(),
@@ -15,10 +20,7 @@ export const loginSchema = z.object({
 
 export const accountSchema = z.object({
   name: z.string().min(1, "Name cannot be empty"),
-  type: z.enum(
-    ["cash", "chequing", "saving", "credit", "loan"],
-    "Please select an account type",
-  ),
+  type: z.enum(accountTypeEnum, "Please select an account type"),
 });
 
 export const categorySchema = z.object({
@@ -46,23 +48,22 @@ export const transactionSchema = z.object({
   amount: z
     .number("Amount must be a number")
     .positive("Amount must be greater than 0"),
-  description: z.string().optional(),
   date: z.string().regex(/\d{4}-\d{2}-\d{2}/gm),
-  type: z.enum(["income", "expense"], "Type must be either income or expense"),
-  recurring_frequency: z
-    .enum(
-      ["daily", "weekly", "monthly", "yearly"],
-      "Please select a recurring frequency",
-    )
-    .optional()
-    .nullable(),
-  recurring_day: z.number().optional().nullable(),
-  recurring_month: z.number().optional().nullable(),
-  recurring_interval: z.number().optional().nullable(),
+  type: z.enum(transactionTypeEnum, "Type must be either income or expense"),
   account_id: z.number("Account id must be provided").min(1),
   category_id: z
     .number("Category id must be provided")
     .min(1)
-    .nullable()
-    .default(1),
+    .default(1)
+    .nullish(),
+  recurring_frequency: z
+    .enum(
+      transactionRecurringFrequencyEnum,
+      "Please select a recurring frequency",
+    )
+    .nullish(),
+  description: z.string().nullish(),
+  recurring_day: z.number().nullish(),
+  recurring_month: z.number().nullish(),
+  recurring_interval: z.number().nullish(),
 });
