@@ -4,6 +4,7 @@ import {
   createAccount,
   deleteAccount,
   getAccounts,
+  getAccountsSummary,
   updateAccount,
 } from "../services/account.service";
 import { CreateAccount, UpdateAccount } from "../types/account";
@@ -11,6 +12,21 @@ import { getParamId, getUserId } from "utils/request.utils";
 import { sendCreated, sendError, sendSuccess } from "utils/response.utils";
 import { accountSchema } from "@/lib/schema";
 const router = express.Router();
+
+router.get("/summary", requireAuth, (req, res) => {
+  try {
+    const userId = getUserId(req);
+    const { net_worth } = getAccountsSummary(userId);
+    const net_worth_formatted = new Intl.NumberFormat("en-CA", {
+      style: "currency",
+      currency: "CAD",
+    }).format(net_worth / 100);
+    return sendSuccess(res, { net_worth, net_worth_formatted });
+  } catch (err) {
+    console.error(err);
+    return sendError(res, 500, "Internal server error");
+  }
+});
 
 router.get("/", requireAuth, (req, res) => {
   try {

@@ -5,6 +5,10 @@ import {
   CreateTransaction,
   UpdateTransaction,
 } from "../types/transaction";
+import {
+  invalidateAccountCache,
+  invalidateTransactionCache,
+} from "utils/cache.utils";
 
 export function getTransactions(userId: number): Transaction[] {
   const cacheKey = `transactions_${userId}`;
@@ -30,8 +34,8 @@ export function getTransactionById(
 }
 
 export function createTransaction(transaction: CreateTransaction): number {
-  const cacheKey = `transactions_${transaction.user_id}`;
-  cache.del(cacheKey);
+  invalidateAccountCache(transaction.user_id);
+  invalidateTransactionCache(transaction.user_id);
   const query = db.prepare(
     "INSERT INTO transactions (name, amount, description, date, type, recurring_frequency, recurring_day, recurring_month, recurring_interval, user_id, account_id, category_id) VALUES (?,?,?,?,?,?,?,?,?, ?,?,?)",
   );
@@ -56,8 +60,8 @@ export function updateTransaction(
   id: number,
   transaction: UpdateTransaction,
 ): number {
-  const cacheKey = `transactions_${transaction.user_id}`;
-  cache.del(cacheKey);
+  invalidateAccountCache(transaction.user_id);
+  invalidateTransactionCache(transaction.user_id);
   const query = db.prepare(
     "UPDATE transactions SET name = ?, amount = ?, description = ?, date = ?, type = ?, recurring_frequency = ?, recurring_day = ?, recurring_month = ?, recurring_interval = ?, account_id = ?, category_id = ? WHERE id = ? AND user_id = ?",
   );
@@ -80,8 +84,8 @@ export function updateTransaction(
 }
 
 export function deleteTransaction(id: number, userId: number): void {
-  const cacheKey = `transactions_${userId}`;
-  cache.del(cacheKey);
+  invalidateAccountCache(userId);
+  invalidateTransactionCache(userId);
   const query = db.prepare(
     "DELETE FROM transactions WHERE id = ? AND user_id = ?",
   );

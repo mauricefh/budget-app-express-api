@@ -20,7 +20,10 @@ export const loginSchema = z.object({
 
 export const accountSchema = z.object({
   name: z.string().min(1, "Name is required"),
-  type: z.enum(accountTypeEnum, "Account type is required"),
+  type: z.enum(
+    ["cash", "chequing", "saving", "credit", "loan"],
+    "Account type is required",
+  ),
 });
 
 export const categorySchema = z.object({
@@ -35,12 +38,15 @@ export const transactionSchema = z
       .number("Amount must be a number")
       .positive("Amount must be greater than 0"),
     date: z.string().regex(/\d{4}-\d{2}-\d{2}/gm),
-    type: z.enum(transactionTypeEnum, "Type must be either income or expense"),
+    type: z.enum(
+      ["income", "expense"],
+      "Type must be either income or expense",
+    ),
     account_id: z.number("Account id required").min(1),
     category_id: z.number("Category is required").min(1).default(1).nullish(),
     recurring_frequency: z
       .enum(
-        transactionRecurringFrequencyEnum,
+        ["daily", "weekly", "monthly", "yearly"],
         "Please select a recurring frequency",
       )
       .nullish(),
