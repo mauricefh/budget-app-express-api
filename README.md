@@ -150,9 +150,8 @@ SEED_ON_STARTUP=false
 
 ### Phase 5
 
-- [ ] Input validation (email format, password length, amount > 0) via Zod
-- [ ] Consistent error handling across routes
-- [ ] `biweekly` interval support for weekly recurring transactions
+- [x] Input validation (email format, password length, amount > 0) via Zod
+- [x] Consistent error handling across routes
 - [ ] Handle missed cronjobs on server restart
 
 ---
